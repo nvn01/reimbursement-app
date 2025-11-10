@@ -39,9 +39,10 @@ func main() {
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(userRepo, cfg)
 	reimbHandler := handlers.NewReimbursementHandler(reimbRepo, userRepo)
+	uploadHandler := handlers.NewUploadHandler("./uploads")
 
 	// Setup router
-	router := setupRouter(cfg, authHandler, reimbHandler)
+	router := setupRouter(cfg, authHandler, reimbHandler, uploadHandler)
 
 	// Start server
 	addr := cfg.Server.Host + ":" + cfg.Server.Port
@@ -51,11 +52,14 @@ func main() {
 	}
 }
 
-func setupRouter(cfg *config.Config, authHandler *handlers.AuthHandler, reimbHandler *handlers.ReimbursementHandler) *gin.Engine {
+func setupRouter(cfg *config.Config, authHandler *handlers.AuthHandler, reimbHandler *handlers.ReimbursementHandler, uploadHandler *handlers.UploadHandler) *gin.Engine {
 	router := gin.Default()
 
 	// Apply CORS middleware
 	router.Use(middleware.CORSMiddleware())
+
+	// Serve static files (uploaded receipts)
+	router.Static("/uploads", "./uploads")
 
 	// Public routes
 	public := router.Group("/api")
@@ -85,6 +89,7 @@ func setupRouter(cfg *config.Config, authHandler *handlers.AuthHandler, reimbHan
 			employee.POST("/reimbursements", reimbHandler.Create)
 			employee.PUT("/reimbursements/:id", reimbHandler.Update)
 			employee.DELETE("/reimbursements/:id", reimbHandler.Delete)
+			employee.POST("/upload/receipt", uploadHandler.UploadReceipt)
 		}
 
 		// Reimbursements - Manager only

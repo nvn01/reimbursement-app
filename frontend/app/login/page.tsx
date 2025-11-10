@@ -54,42 +54,6 @@ export default function LoginPage() {
     }
   }
 
-  const quickLogin = async (user: string, pass: string) => {
-    setUsername(user)
-    setPassword(pass)
-    setIsLoading(true)
-
-    try {
-      const response = await authAPI.login({ username: user, password: pass })
-      
-      toast({
-        title: "Login Berhasil",
-        description: `Selamat datang, ${response.user.full_name}!`,
-      })
-
-      // Redirect based on role
-      switch (response.user.role) {
-        case 'employee':
-          router.push('/employee')
-          break
-        case 'manager':
-          router.push('/manager')
-          break
-        case 'finance':
-          router.push('/finance')
-          break
-      }
-    } catch (error: any) {
-      toast({
-        title: "Login Gagal",
-        description: error.message || "Terjadi kesalahan",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       <div className="mb-8 flex items-center gap-2">
@@ -140,33 +104,6 @@ export default function LoginPage() {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 space-y-3">
-            <p className="text-center text-sm text-muted-foreground">Akses Demo:</p>
-            <div className="grid gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => quickLogin('karyawan', 'karyawan123')}
-                disabled={isLoading}
-              >
-                Login sebagai Employee
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => quickLogin('manager', 'manager123')}
-                disabled={isLoading}
-              >
-                Login sebagai Manager
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => quickLogin('finance', 'finance123')}
-                disabled={isLoading}
-              >
-                Login sebagai Finance
-              </Button>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

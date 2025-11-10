@@ -1,5 +1,6 @@
 // API Configuration
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
 
 // Types
 export type UserRole = 'employee' | 'manager' | 'finance';
@@ -112,9 +113,8 @@ async function apiRequest<T>(
 ): Promise<T> {
   const token = getAuthToken();
   
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options.headers,
   };
 
   if (token) {
@@ -172,6 +172,33 @@ export const authAPI = {
 
   isAuthenticated: (): boolean => {
     return getAuthToken() !== null;
+  },
+};
+
+// Upload API
+export const uploadAPI = {
+  uploadReceipt: async (file: File): Promise<{ url: string; filename: string; size: number }> => {
+    const token = getAuthToken();
+    const formData = new FormData();
+    formData.append('receipt', file);
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/upload/receipt`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Upload failed' }));
+      throw new APIError(response.status, error.error || 'Upload failed');
+    }
+
+    return response.json();
   },
 };
 
@@ -250,4 +277,11 @@ export const healthAPI = {
   check: (): Promise<{ status: string }> => {
     return apiRequest<{ status: string }>('/health');
   },
+};
+
+// Helper function to get full URL for uploaded files
+export const getFileUrl = (path: string): string => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  return `${BACKEND_URL}${path}`;
 };

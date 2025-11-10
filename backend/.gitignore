@@ -34,3 +34,11 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Uploads
+uploads/
+
+# Scripts with sensitive data (use .env instead)
+scripts/seed_users.go
+scripts/fix_passwords.go
+scripts/check_users.go
