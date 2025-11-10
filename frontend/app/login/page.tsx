@@ -1,11 +1,95 @@
-import Link from "next/link"
+'use client';
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { FileText } from "lucide-react"
+import { FileText, Loader2 } from "lucide-react"
+import { authAPI } from "@/lib/api"
+import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
+  const router = useRouter()
+  const { toast } = useToast()
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      const response = await authAPI.login({ username, password })
+      
+      toast({
+        title: "Login Berhasil",
+        description: `Selamat datang, ${response.user.full_name}!`,
+      })
+
+      // Redirect based on role
+      switch (response.user.role) {
+        case 'employee':
+          router.push('/employee')
+          break
+        case 'manager':
+          router.push('/manager')
+          break
+        case 'finance':
+          router.push('/finance')
+          break
+        default:
+          router.push('/')
+      }
+    } catch (error: any) {
+      toast({
+        title: "Login Gagal",
+        description: error.message || "Username atau password salah",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const quickLogin = async (user: string, pass: string) => {
+    setUsername(user)
+    setPassword(pass)
+    setIsLoading(true)
+
+    try {
+      const response = await authAPI.login({ username: user, password: pass })
+      
+      toast({
+        title: "Login Berhasil",
+        description: `Selamat datang, ${response.user.full_name}!`,
+      })
+
+      // Redirect based on role
+      switch (response.user.role) {
+        case 'employee':
+          router.push('/employee')
+          break
+        case 'manager':
+          router.push('/manager')
+          break
+        case 'finance':
+          router.push('/finance')
+          break
+      }
+    } catch (error: any) {
+      toast({
+        title: "Login Gagal",
+        description: error.message || "Terjadi kesalahan",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
       <div className="mb-8 flex items-center gap-2">
@@ -21,31 +105,65 @@ export default function LoginPage() {
           <CardDescription>Masukkan kredensial Anda untuk mengakses akun</CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="name@company.com" />
+              <Label htmlFor="username">Username</Label>
+              <Input 
+                id="username" 
+                type="text" 
+                placeholder="username" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={isLoading}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" />
+              <Input 
+                id="password" 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={isLoading}
+                required
+              />
             </div>
-            <Button className="w-full" size="lg">
-              Masuk
+            <Button className="w-full" size="lg" type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Memproses...
+                </>
+              ) : (
+                'Masuk'
+              )}
             </Button>
           </form>
 
           <div className="mt-6 space-y-3">
             <p className="text-center text-sm text-muted-foreground">Akses Demo:</p>
             <div className="grid gap-2">
-              <Button variant="outline" asChild>
-                <Link href="/employee">Employee Dashboard</Link>
+              <Button 
+                variant="outline" 
+                onClick={() => quickLogin('karyawan', 'karyawan123')}
+                disabled={isLoading}
+              >
+                Login sebagai Employee
               </Button>
-              <Button variant="outline" asChild>
-                <Link href="/manager">Manager Dashboard</Link>
+              <Button 
+                variant="outline" 
+                onClick={() => quickLogin('manager', 'manager123')}
+                disabled={isLoading}
+              >
+                Login sebagai Manager
               </Button>
-              <Button variant="outline" asChild>
-                <Link href="/finance">Finance Admin Dashboard</Link>
+              <Button 
+                variant="outline" 
+                onClick={() => quickLogin('finance', 'finance123')}
+                disabled={isLoading}
+              >
+                Login sebagai Finance
               </Button>
             </div>
           </div>
