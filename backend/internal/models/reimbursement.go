@@ -29,6 +29,7 @@ type Reimbursement struct {
 	ID              int                   `json:"id" db:"id"`
 	EmployeeID      int                   `json:"employee_id" db:"employee_id"`
 	EmployeeName    string                `json:"employee_name" db:"employee_name"`
+	Name            string                `json:"name" db:"name"`
 	Title           string                `json:"title" db:"title"`
 	Description     string                `json:"description" db:"description"`
 	Category        ReimbursementCategory `json:"category" db:"category"`
@@ -47,6 +48,7 @@ type Reimbursement struct {
 }
 
 type CreateReimbursementRequest struct {
+	Name        string                `json:"name" binding:"required"`
 	Title       string                `json:"title" binding:"required"`
 	Description string                `json:"description" binding:"required"`
 	Category    ReimbursementCategory `json:"category" binding:"required"`
@@ -55,6 +57,7 @@ type CreateReimbursementRequest struct {
 }
 
 type UpdateReimbursementRequest struct {
+	Name        string                `json:"name"`
 	Title       string                `json:"title"`
 	Description string                `json:"description"`
 	Category    ReimbursementCategory `json:"category"`

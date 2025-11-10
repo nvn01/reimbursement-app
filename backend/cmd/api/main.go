@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -130,6 +131,23 @@ func seedDefaultUsers(db *database.Database, userRepo *repository.UserRepository
 		{"karyawan", "karyawan123", "Employee User", "karyawan@company.com", models.RoleEmployee},
 		{"manager", "manager123", "Manager User", "manager@company.com", models.RoleManager},
 		{"finance", "finance123", "Finance User", "finance@company.com", models.RoleFinance},
+	}
+
+	// Add 50 employee users (karyawan1 to karyawan50)
+	for i := 1; i <= 50; i++ {
+		defaultUsers = append(defaultUsers, struct {
+			username string
+			password string
+			fullName string
+			email    string
+			role     models.UserRole
+		}{
+			username: fmt.Sprintf("karyawan%d", i),
+			password: "karyawan123",
+			fullName: fmt.Sprintf("Karyawan %d", i),
+			email:    fmt.Sprintf("karyawan%d@company.com", i),
+			role:     models.RoleEmployee,
+		})
 	}
 
 	for _, u := range defaultUsers {

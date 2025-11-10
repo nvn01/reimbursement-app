@@ -37,7 +37,8 @@ func (h *ReimbursementHandler) Create(c *gin.Context) {
 
 	reimb := &models.Reimbursement{
 		EmployeeID:   user.ID,
-		EmployeeName: user.FullName,
+		EmployeeName: req.Name, // Use the name from form input
+		Name:         req.Name,
 		Title:        req.Title,
 		Description:  req.Description,
 		Category:     req.Category,
@@ -133,6 +134,9 @@ func (h *ReimbursementHandler) Update(c *gin.Context) {
 	}
 
 	// Update fields if provided
+	if req.Name != "" {
+		reimb.Name = req.Name
+	}
 	if req.Title != "" {
 		reimb.Title = req.Title
 	}

@@ -18,14 +18,15 @@ func NewReimbursementRepository(db *sql.DB) *ReimbursementRepository {
 
 func (r *ReimbursementRepository) Create(reimb *models.Reimbursement) error {
 	query := `
-		INSERT INTO reimbursements (employee_id, employee_name, title, description, category, amount, receipt_url, status)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+		INSERT INTO reimbursements (employee_id, employee_name, name, title, description, category, amount, receipt_url, status)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 		RETURNING id, submitted_date, created_at, updated_at
 	`
 	return r.db.QueryRow(
 		query,
 		reimb.EmployeeID,
 		reimb.EmployeeName,
+		reimb.Name,
 		reimb.Title,
 		reimb.Description,
 		reimb.Category,
@@ -38,7 +39,7 @@ func (r *ReimbursementRepository) Create(reimb *models.Reimbursement) error {
 func (r *ReimbursementRepository) GetByID(id int) (*models.Reimbursement, error) {
 	reimb := &models.Reimbursement{}
 	query := `
-		SELECT id, employee_id, employee_name, title, description, category, amount, receipt_url, 
+		SELECT id, employee_id, employee_name, name, title, description, category, amount, receipt_url, 
 		       status, submitted_date, manager_id, manager_notes, manager_approved, 
 		       finance_id, finance_notes, finance_approved, created_at, updated_at
 		FROM reimbursements
@@ -48,6 +49,7 @@ func (r *ReimbursementRepository) GetByID(id int) (*models.Reimbursement, error)
 		&reimb.ID,
 		&reimb.EmployeeID,
 		&reimb.EmployeeName,
+		&reimb.Name,
 		&reimb.Title,
 		&reimb.Description,
 		&reimb.Category,
@@ -75,7 +77,7 @@ func (r *ReimbursementRepository) GetByID(id int) (*models.Reimbursement, error)
 
 func (r *ReimbursementRepository) GetAll() ([]models.Reimbursement, error) {
 	query := `
-		SELECT id, employee_id, employee_name, title, description, category, amount, receipt_url, 
+		SELECT id, employee_id, employee_name, name, title, description, category, amount, receipt_url, 
 		       status, submitted_date, manager_id, manager_notes, manager_approved, 
 		       finance_id, finance_notes, finance_approved, created_at, updated_at
 		FROM reimbursements
@@ -86,7 +88,7 @@ func (r *ReimbursementRepository) GetAll() ([]models.Reimbursement, error) {
 
 func (r *ReimbursementRepository) GetByEmployeeID(employeeID int) ([]models.Reimbursement, error) {
 	query := `
-		SELECT id, employee_id, employee_name, title, description, category, amount, receipt_url, 
+		SELECT id, employee_id, employee_name, name, title, description, category, amount, receipt_url, 
 		       status, submitted_date, manager_id, manager_notes, manager_approved, 
 		       finance_id, finance_notes, finance_approved, created_at, updated_at
 		FROM reimbursements
@@ -98,7 +100,7 @@ func (r *ReimbursementRepository) GetByEmployeeID(employeeID int) ([]models.Reim
 
 func (r *ReimbursementRepository) GetByStatus(status models.ReimbursementStatus) ([]models.Reimbursement, error) {
 	query := `
-		SELECT id, employee_id, employee_name, title, description, category, amount, receipt_url, 
+		SELECT id, employee_id, employee_name, name, title, description, category, amount, receipt_url, 
 		       status, submitted_date, manager_id, manager_notes, manager_approved, 
 		       finance_id, finance_notes, finance_approved, created_at, updated_at
 		FROM reimbursements
@@ -111,12 +113,13 @@ func (r *ReimbursementRepository) GetByStatus(status models.ReimbursementStatus)
 func (r *ReimbursementRepository) Update(reimb *models.Reimbursement) error {
 	query := `
 		UPDATE reimbursements
-		SET title = $1, description = $2, category = $3, amount = $4, receipt_url = $5
-		WHERE id = $6
+		SET name = $1, title = $2, description = $3, category = $4, amount = $5, receipt_url = $6
+		WHERE id = $7
 		RETURNING updated_at
 	`
 	return r.db.QueryRow(
 		query,
+		reimb.Name,
 		reimb.Title,
 		reimb.Description,
 		reimb.Category,
@@ -232,6 +235,7 @@ func (r *ReimbursementRepository) queryReimbursements(query string, args ...inte
 			&reimb.ID,
 			&reimb.EmployeeID,
 			&reimb.EmployeeName,
+			&reimb.Name,
 			&reimb.Title,
 			&reimb.Description,
 			&reimb.Category,

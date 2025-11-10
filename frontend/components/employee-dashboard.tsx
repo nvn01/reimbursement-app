@@ -54,6 +54,7 @@ export function EmployeeDashboard() {
 
   // Form state
   const [formData, setFormData] = useState({
+    name: "",
     title: "",
     description: "",
     category: "" as ReimbursementCategory,
@@ -170,6 +171,7 @@ export function EmployeeDashboard() {
 
       // Create reimbursement with uploaded file URL
       await reimbursementAPI.create({
+        name: formData.name,
         title: formData.title,
         description: formData.description,
         category: formData.category,
@@ -184,6 +186,7 @@ export function EmployeeDashboard() {
 
       setOpen(false)
       setFormData({
+        name: "",
         title: "",
         description: "",
         category: "" as ReimbursementCategory,
@@ -245,6 +248,17 @@ export function EmployeeDashboard() {
                 <DialogDescription>Isi detail untuk klaim reimbursement Anda</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nama</Label>
+                  <Input 
+                    id="name" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Nama Anda"
+                    required
+                    disabled={isSubmitting}
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="title">Judul</Label>
                   <Input 

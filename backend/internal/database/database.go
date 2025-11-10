@@ -59,6 +59,7 @@ func (d *Database) RunMigrations() error {
 			id SERIAL PRIMARY KEY,
 			employee_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
 			employee_name VARCHAR(100) NOT NULL,
+			name VARCHAR(200),
 			title VARCHAR(200) NOT NULL,
 			description TEXT NOT NULL,
 			category VARCHAR(50) NOT NULL CHECK (category IN ('transport', 'accommodation', 'meals', 'office_supply', 'other')),
@@ -75,6 +76,8 @@ func (d *Database) RunMigrations() error {
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)`,
+		
+		`ALTER TABLE reimbursements ADD COLUMN IF NOT EXISTS name VARCHAR(200)`,
 		
 		`CREATE INDEX IF NOT EXISTS idx_reimbursements_employee_id ON reimbursements(employee_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_reimbursements_status ON reimbursements(status)`,
