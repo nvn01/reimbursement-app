@@ -1,7 +1,8 @@
-# Environment files
+# Environment files - ALL .env files including examples
 .env
-.env.local
-.env*.local
+.env*
+*.env
+*.env.*
 
 # IDE
 .vscode/
@@ -23,3 +24,7 @@ yarn-error.log*
 # Temporary files
 *.tmp
 *.temp
+
+# Documentation - exclude markdown files
+*.md
+!README.md
